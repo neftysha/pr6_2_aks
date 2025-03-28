@@ -1,0 +1,42 @@
+﻿<Page x:Class="RegTest.Pages.Login"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:RegTest"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Login">
+    <Page.Resources>
+        <ResourceDictionary Source="../Styles.xaml"/>
+    </Page.Resources>
+
+    <Grid Background="White">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
+
+            <TextBlock Text="Аутентификация" Style="{StaticResource TextBlockStyle}" Margin="0,0,0,20"/>
+
+            <Grid Margin="0,15,0,0" VerticalAlignment="Top" Width="250">
+                <TextBlock Text="Введите логин" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0" Foreground="#A9A9A9"/>
+                <TextBox Name="LoginTextBox" Style="{StaticResource StyledTextBox}" Margin="102,0,0,0" HorizontalAlignment="Left" Width="148" />
+            </Grid>
+
+            <Grid HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top" Width="250">
+                <TextBlock Text="Введите пароль" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0" Foreground="#A9A9A9"/>
+                <PasswordBox x:Name="PasswordBox" Style="{StaticResource StyledPasswordBox}" HorizontalAlignment="Left" Width="148" Margin="102,0,0,0"/>
+            </Grid>
+
+            <Border BorderThickness="1" CornerRadius="20" HorizontalAlignment="Center" Margin="0,15,0,0" Height="75" Width="248">
+                <Button Name="SignInButton" Content="Войти" Style="{StaticResource RoundedButtonStyle}" Click="SignInButton_Click"/>
+            </Border>
+
+            <TextBlock HorizontalAlignment="Center" Margin="0,15,0,0">
+                <Run Text="Нет аккаунта? "/>
+                <Hyperlink Click="RegisterLink_Click">
+                    <Run Text="Зарегистрируйтесь"/>
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+
+</Page>
