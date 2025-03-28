@@ -26,6 +26,17 @@
                 <PasswordBox x:Name="PasswordBox" Style="{StaticResource StyledPasswordBox}" HorizontalAlignment="Left" Width="148" Margin="102,0,0,0"/>
             </Grid>
 
+            <!-- CAPTCHA Section - Initially Collapsed -->
+            <StackPanel Name="CaptchaPanel" Margin="0,15,0,0" Visibility="Collapsed">
+                <Border BorderBrush="Gray" BorderThickness="1" Padding="10" CornerRadius="5">
+                    <Grid>
+                        <Canvas Name="CaptchaCanvas" Width="200" Height="50" Background="LightGray"/>
+                        <TextBox Name="CaptchaInput" Width="200" Margin="0,60,0,0" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Border>
+                <TextBlock Name="CaptchaMessage" Foreground="Red" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+            </StackPanel>
+
             <Border BorderThickness="1" CornerRadius="20" HorizontalAlignment="Center" Margin="0,15,0,0" Height="75" Width="248">
                 <Button Name="SignInButton" Content="Войти" Style="{StaticResource RoundedButtonStyle}" Click="SignInButton_Click"/>
             </Border>
@@ -38,5 +49,4 @@
             </TextBlock>
         </StackPanel>
     </Grid>
-
 </Page>

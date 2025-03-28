@@ -19,7 +19,12 @@ namespace RegTest
             : base("name=Artem134Entities")
         {
         }
-    
+        private static Artem134Entities _context;
+        public static Artem134Entities GetContext()
+        {
+            if (_context == null) _context = new Artem134Entities(); return _context;
+        }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             throw new UnintentionalCodeFirstException();

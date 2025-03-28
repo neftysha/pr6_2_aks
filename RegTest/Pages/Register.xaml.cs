@@ -4,7 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using RegTest;
+using System.Windows.Navigation;
+using System.Net.Mail;
 
 namespace RegTest.Pages
 {
@@ -15,93 +16,99 @@ namespace RegTest.Pages
             InitializeComponent();
         }
 
-        public static string GetHash(string password)
+        public bool RegisterUser(string firstName, string lastName, string username,
+                                 string email, string phone, string password)
         {
-            using (var hash = SHA1.Create())
+            if (!ValidateUserInput(firstName, lastName, username, email, phone, password))
+                return false;
+
+            try
             {
-                return string.Concat(hash.ComputeHash(Encoding.UTF8.GetBytes(password)).Select(x => x.ToString("X2")));
+                return TryRegisterUser(firstName, lastName, username, email, phone, password);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка регистрации: " + ex.Message, "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
         }
 
-        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        private bool ValidateUserInput(string firstName, string lastName, string username,
+                                       string email, string phone, string password)
         {
-            string firstName = FirstNameTextBox.Text.Trim();
-            string lastName = LastNameTextBox.Text.Trim();
-            string username = UsernameTextBox.Text.Trim();
-            string email = EmailTextBox.Text.Trim();
-            string phone = PhoneTextBox.Text.Trim();
-            string password = PasswordBox.Password;
-            string confirmPassword = ConfirmPasswordBox.Password;
-
-            if (string.IsNullOrEmpty(firstName) ||
-                string.IsNullOrEmpty(lastName) ||
-                string.IsNullOrEmpty(username) ||
-                string.IsNullOrEmpty(email) ||
-                string.IsNullOrEmpty(phone) ||
-                string.IsNullOrEmpty(password) ||
-                string.IsNullOrEmpty(confirmPassword))
+            if (string.IsNullOrWhiteSpace(firstName) ||
+                string.IsNullOrWhiteSpace(lastName) ||
+                string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(email) ||
+                string.IsNullOrWhiteSpace(phone) ||
+                string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("Пожалуйста, заполните все поля!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            if (password.Length < 6)
-            {
-                MessageBox.Show("Пароль должен содержать минимум 6 символов.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            if (password != confirmPassword)
-            {
-                MessageBox.Show("Пароли не совпадают!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                MessageBox.Show("Заполните все поля!", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
 
             if (!IsValidEmail(email))
             {
-                MessageBox.Show("Введите корректный email.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                MessageBox.Show("Введите корректный адрес электронной почты", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
 
-            if (!IsValidPhone(phone))
+            if (!IsValidPhoneNumber(phone))
             {
-                MessageBox.Show("Телефон должен начинаться с +7 и содержать только цифры.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                MessageBox.Show("Номер должен начинаться с +7 и содержать 12 символов", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
 
-            string hashedPassword = GetHash(password);
-
-            try
+            if (password.Length < 6)
             {
-                using (var db = new Artem134Entities())
+                MessageBox.Show("Пароль должен быть минимум 6 символов", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool TryRegisterUser(string firstName, string lastName, string username,
+                                     string email, string phone, string password)
+        {
+            using (var db = new Artem134Entities())
+            {
+                var existingUser = db.Users.FirstOrDefault(u => u.Username == username || u.Email == email);
+                if (existingUser != null)
                 {
-                    var existingUser = db.Users.AsNoTracking().FirstOrDefault(u => u.Username == username || u.Email == email);
-                    if (existingUser != null)
-                    {
-                        MessageBox.Show("Пользователь с таким логином или email уже существует.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-
-                    var newUser = new Users
-                    {
-                        FirstName = firstName,
-                        LastName = lastName,
-                        Username = username,
-                        PasswordHash = hashedPassword,
-                        Email = email,
-                        Phone = phone,
-                    };
-
-                    db.Users.Add(newUser);
-                    db.SaveChanges();
-
-                    MessageBox.Show("Регистрация успешна!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    NavigationService.Navigate(new Login());
+                    MessageBox.Show("Такой пользователь или email уже существует", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
                 }
+
+                var user = new Users
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = username,
+                    Email = email,
+                    Phone = phone,
+                    PasswordHash = HashPassword(password)
+                };
+
+                db.Users.Add(user);
+                db.SaveChanges();
+                return true;
             }
-            catch (Exception ex)
+        }
+
+        public static string HashPassword(string password)
+        {
+            using (var sha1 = SHA1.Create())
             {
-                MessageBox.Show($"Ошибка при регистрации: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                byte[] hashedBytes = sha1.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var hashString = BitConverter.ToString(hashedBytes);
+                return hashString.Replace("-", "").ToLower();
             }
         }
 
@@ -109,8 +116,8 @@ namespace RegTest.Pages
         {
             try
             {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
+                MailAddress address = new MailAddress(email);
+                return address.Address == email;
             }
             catch
             {
@@ -118,16 +125,48 @@ namespace RegTest.Pages
             }
         }
 
-        private bool IsValidPhone(string phone)
+        private bool IsValidPhoneNumber(string phone)
         {
-            return phone.StartsWith("+7") &&
-                   phone.Length >= 12 &&
-                   phone.Skip(1).All(char.IsDigit);
+            if (phone.Length != 12)
+                return false;
+
+            if (!phone.StartsWith("+7"))
+                return false;
+
+            string digits = phone.Substring(1);
+            foreach (char c in digits)
+            {
+                if (!char.IsDigit(c))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        {
+            bool success = RegisterUser(
+                FirstNameTextBox.Text.Trim(),
+                LastNameTextBox.Text.Trim(),
+                UsernameTextBox.Text.Trim(),
+                EmailTextBox.Text.Trim(),
+                PhoneTextBox.Text.Trim(),
+                PasswordBox.Password);
+
+            if (success)
+            {
+                MessageBox.Show("Регистрация успешно завершена!", "Успех",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+
+                if (NavigationService != null)
+                    NavigationService.Navigate(new Login());
+            }
         }
 
         private void LoginLink_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new Login());
+            if (NavigationService != null)
+                NavigationService.Navigate(new Login());
         }
     }
 }
