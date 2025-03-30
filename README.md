@@ -27,6 +27,7 @@ CREATE TABLE Users (
 ### Скриншот успешного создания таблицы:
 ![image](https://github.com/user-attachments/assets/d8d42dd5-e62b-40d9-8b68-65657498adf4)
 
+***
 
 ### Скриншот содержимого таблицы пользователей:
 ![image](https://github.com/user-attachments/assets/52ddeb2f-8eb2-4cc9-866b-0f16d6802edc)
@@ -38,6 +39,7 @@ CREATE TABLE Users (
 
 ![image](https://github.com/user-attachments/assets/af21f03a-83aa-45b1-85c8-09c30488f229)
 
+***
 
 ## Капча которая появляеться после 3-х не правильных попыток входа:
 
