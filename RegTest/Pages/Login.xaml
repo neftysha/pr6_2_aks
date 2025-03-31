@@ -14,7 +14,7 @@
     <Grid Background="White">
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
 
-            <TextBlock Text="Аутентификация" Style="{StaticResource TextBlockStyle}" Margin="0,0,0,20"/>
+            <TextBlock Text="Авторизация" Style="{StaticResource TextBlockStyle}" Margin="0,0,0,20"/>
 
             <Grid Margin="0,15,0,0" VerticalAlignment="Top" Width="250">
                 <TextBlock Text="Введите логин" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0" Foreground="#A9A9A9"/>
@@ -42,7 +42,7 @@
             </Border>
 
             <TextBlock HorizontalAlignment="Center" Margin="0,15,0,0">
-                <Run Text="Нет аккаунта? "/>
+                <Run Text="Вы еще не с нами? "/>
                 <Hyperlink Click="RegisterLink_Click">
                     <Run Text="Зарегистрируйтесь"/>
                 </Hyperlink>
