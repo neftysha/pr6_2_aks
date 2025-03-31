@@ -43,7 +43,7 @@ CREATE TABLE Users (
 
 ## Капча которая появляеться после 3-х не правильных попыток входа:
 
-![image](https://github.com/user-attachments/assets/f13039ce-15a1-4297-b69a-bcc9901acbe6)
+![](6_4.jpg)
 
 
 ## Вывод о проведенном тестировании
